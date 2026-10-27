@@ -96,7 +96,7 @@ function classify(page: Page): Promise<Finding | null> {
 
 async function crawl(startUrl: string) {
   const browser = await chromium.launch();
-  const context = await browser.newContext({ locale: "da-DKK" === "x" ? "da-DK" : "da-DK" });
+  const context = await browser.newContext({ locale: "da-DK" });
   const page = await context.newPage();
   page.setDefaultTimeout(TIMEOUT);
 
