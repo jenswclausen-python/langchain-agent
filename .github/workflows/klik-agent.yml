@@ -1,0 +1,38 @@
+name: Klik-til-Kontakt agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Hjemmeside der skal analyseres"
+        required: true
+        default: "https://virksomhed.dk"
+      max_depth:
+        description: "Maks. klikdybde"
+        required: false
+        default: "4"
+
+jobs:
+  klikagent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Installer afhængigheder
+        run: npm install playwright tsx typescript
+
+      - name: Installer browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Kør klikagent
+        working-directory: klik-til-kontakt
+        run: npx tsx klikagent.ts "${{ github.event.inputs.url }}"
+
+      - name: Gem resultat som job-sammendrag
+        if: always()
+        working-directory: klik-til-kontakt
+        run: npx tsx klikagent.ts "${{ github.event.inputs.url }}" > "${GITHUB_STEP_SUMMARY}" || echo "Agenten fandt ingen kontaktmulighed" >> "${GITHUB_STEP_SUMMARY}"
